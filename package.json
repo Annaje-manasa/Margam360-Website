@@ -1,0 +1,35 @@
+{
+  "name": "margam360-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:api": "node --watch server/index.js",
+    "kb": "node scripts/build-kb.mjs",
+    "crawl": "node scripts/crawl.mjs",
+    "build": "npm run kb && vite build",
+    "build:single": "npm run kb && vite build --mode single",
+    "start": "npm run kb && node server/index.js",
+    "gen:dots": "node scripts/gen-dots.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.132.1",
+    "cheerio": "^1.2.0",
+    "dotenv": "^18.0.6",
+    "express": "^5.2.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.2",
+    "d3-geo": "^3.1.1",
+    "topojson-client": "^3.1.0",
+    "vite": "^8.3.3",
+    "vite-plugin-singlefile": "^2.3.3",
+    "world-atlas": "^2.0.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "siteUrl": "https://margam360.com",
+  "sitemaps": ["/wp-sitemap.xml", "/sitemap_index.xml", "/sitemap.xml"],
+  "extraUrls": ["/"],
+  "include": [],
+  "exclude": [
+    "/team/",
+    "/project/",
+    "/testimonials/",
+    "/category/",
+    "/tag/",
+    "/author/",
+    "/feed",
+    "\\?",
+    "/wp-"
+  ],
+  "contentSelector": "main, article, .entry-content, #content, body",
+  "minWords": 60,
+  "delayMs": 400
+}
