@@ -186,3 +186,31 @@ html.cursor-on.mc-native :is(input, textarea, select) { cursor: text; }
 .svc-outcome strong .av, .svc-outcome strong .av span,
 .console-kpis strong .av, .console-kpis strong .av span { font: inherit; color: inherit; letter-spacing: inherit; }
 .av { font-variant-numeric: tabular-nums; }
+
+/* ---------- Hero field canvas (2D constellation animation) ---------- */
+.hero-field {
+  z-index: -1;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+.hero-grid-bg,
+.hero-copy {
+  will-change: translate;
+}
+.hero-globe-3d {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-field,
+  .hero-globe-3d {
+    display: none !important;
+  }
+}

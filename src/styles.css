@@ -1046,76 +1046,114 @@ ul, ol, dl, dd { margin: 0; padding: 0; list-style: none; }
 .why-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
 .why-card {
-  padding: 28px;
-  transition: transform 0.4s var(--ease), border-color 0.4s var(--ease), box-shadow 0.4s var(--ease), background 0.4s;
   position: relative;
+  border-radius: var(--radius);
+  transition: transform 0.4s var(--ease), border-color 0.4s var(--ease), box-shadow 0.4s var(--ease), background 0.4s;
+  overflow: hidden;
 }
+
+.why-card:not(.why-statement) {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.why-card.is-featured {
+  border-color: rgba(229, 38, 31, 0.85);
+  box-shadow: 0 0 24px rgba(229, 38, 31, 0.28), inset 0 0 1px 1px rgba(229, 38, 31, 0.35);
+}
+
 .why-card:not(.why-statement):hover {
   transform: translateY(-6px);
-  border-color: rgba(229, 38, 31, 0.45);
-  box-shadow: 0 16px 36px -12px rgba(229, 38, 31, 0.22), 0 0 1px 1px rgba(229, 38, 31, 0.3);
+  border-color: rgba(229, 38, 31, 0.7);
+  box-shadow: 0 16px 36px -12px rgba(229, 38, 31, 0.3), 0 0 20px rgba(229, 38, 31, 0.2);
   background: linear-gradient(180deg, rgba(229, 38, 31, 0.06), rgba(255, 255, 255, 0.015));
 }
 
-.why-check {
-  display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px;
-  background: var(--red-a10); color: var(--red-hi); border: 1px solid var(--red-a20);
-  box-shadow: 0 0 10px rgba(229, 38, 31, 0.15);
-  transition: transform 0.35s var(--ease), background 0.35s, color 0.35s, border-color 0.35s, box-shadow 0.35s;
-}
-.why-card:hover .why-check {
-  transform: scale(1.15) rotate(4deg);
-  background: var(--red);
-  color: #fff;
-  border-color: var(--red-hi);
-  box-shadow: 0 0 20px rgba(229, 38, 31, 0.75);
+.why-card-media {
+  width: 100%;
+  height: 124px;
+  overflow: hidden;
+  position: relative;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
 }
 
-.why-card h3 { margin-top: 22px; font-size: 22px; letter-spacing: -0.02em; transition: color 0.3s var(--ease); }
-.why-card:hover h3 { color: #fff; }
-.why-card p { margin-top: 10px; color: var(--muted); font-size: 15px; transition: color 0.3s; }
-.why-card:hover p { color: var(--ink-2); }
+.why-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.6s var(--ease);
+}
+
+.why-card:hover .why-card-media img {
+  transform: scale(1.05);
+}
+
+.why-card-body {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.why-card-body h3 {
+  margin-top: 0;
+  font-size: 21px;
+  letter-spacing: -0.02em;
+  transition: color 0.3s var(--ease);
+  color: var(--ink);
+}
+
+.why-card:hover .why-card-body h3 { color: #fff; }
+
+.why-card-body p {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.5;
+  transition: color 0.3s;
+}
+
+.why-card:hover .why-card-body p { color: var(--ink-2); }
 
 .why-statement {
   grid-column: 1 / -1;
-  background: linear-gradient(135deg, var(--red) 0%, #c41c16 45%, #99130e 75%, var(--red) 100%);
-  background-size: 220% 220%;
-  animation: statementShimmer 8s ease-in-out infinite alternate;
+  background-color: #8a130f;
+  background-size: cover;
+  background-position: right center;
+  background-repeat: no-repeat;
   border-color: transparent;
-  padding: 36px;
+  padding: 38px 44px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 14px 44px -12px rgba(229, 38, 31, 0.4);
+  box-shadow: 0 14px 44px -12px rgba(229, 38, 31, 0.45);
   transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
 }
-@keyframes statementShimmer {
-  0% { background-position: 0% 40%; }
-  100% { background-position: 100% 60%; }
-}
-.why-statement::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.1) 45%, rgba(255, 255, 255, 0.2) 50%, transparent 55%);
-  background-size: 250% 100%;
-  animation: statementBeam 7s ease-in-out infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-@keyframes statementBeam {
-  0%, 30% { background-position: 250% 0; }
-  70%, 100% { background-position: -150% 0; }
-}
-.why-statement > * {
+.why-statement h3 {
+  margin-top: 0;
+  font-size: clamp(28px, 2.8vw, 38px);
+  color: #fff;
+  max-width: 580px;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
-.why-statement h3 { margin-top: 0; font-size: clamp(30px, 3vw, 42px); }
-.why-statement p { color: rgba(255, 255, 255, 0.88); font-size: 16px; max-width: 560px; }
+.why-statement p {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 15.5px;
+  line-height: 1.55;
+  margin-top: 10px;
+  max-width: 580px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 2;
+}
 .why-statement:hover {
   border-color: transparent;
   transform: translateY(-4px) scale(1.008);
-  box-shadow: 0 24px 55px -10px rgba(229, 38, 31, 0.6), 0 0 35px rgba(229, 38, 31, 0.35);
+  box-shadow: 0 24px 55px -10px rgba(229, 38, 31, 0.65), 0 0 35px rgba(229, 38, 31, 0.4);
 }
 
 /* testimonials */
@@ -1271,6 +1309,7 @@ ul, ol, dl, dd { margin: 0; padding: 0; list-style: none; }
 }
 @media (max-width: 768px) {
   .ai-grid { grid-template-columns: 1fr; }
+  .why-statement { padding: 28px 24px; }
 }
 @media (max-width: 560px) {
   .eyebrow-pill { font-size: 10.5px; letter-spacing: 0.1em; }

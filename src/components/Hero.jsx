@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import Globe from './Globe.jsx';
 import FlightPath from './FlightPath.jsx';
 import CountUp from './CountUp.jsx';
+import HeroField from '../motion/HeroField.jsx';
 import { HERO_STATS } from '../data/content.js';
 
 export default function Hero() {
@@ -9,26 +10,26 @@ export default function Hero() {
   const globeRef = useRef(null);
   return (
     <section className="hero" id="top" ref={heroRef}>
-      <div className="hero-grid-bg" aria-hidden="true" />
+      <div className="hero-grid-bg" aria-hidden="true" data-parallax="-0.1" />
+      <HeroField />
       <FlightPath heroRef={heroRef} globeRef={globeRef} />
 
-
       <div className="container hero-inner">
-        <div className="hero-copy">
+        <div className="hero-copy" data-parallax="0.09">
           <p className="eyebrow eyebrow-pill">
             <span className="live-dot" aria-hidden="true" />
-            Hyderabad’s #1 Performance Marketing Agency
+            Hyderabad's #1 Performance Marketing Agency
           </p>
           <h1 className="hero-title">
             <span className="line">Explode Your</span>
             <span className="line accent">Revenue.</span>
           </h1>
           <p className="hero-sub">
-            We don’t just run campaigns — we engineer compounding growth for ambitious brands.
+            We don't just run campaigns — we engineer compounding growth for ambitious brands.
             Your AI-powered 360° marketing partner, from strategy to scale, across India and the US.
           </p>
           <div className="hero-ctas">
-            <a href="#booking" className="btn btn-primary">
+            <a href="#booking" className="btn btn-primary" data-magnetic="0.18">
               Start my free strategy call
             </a>
             <a href="#services" className="btn-link">

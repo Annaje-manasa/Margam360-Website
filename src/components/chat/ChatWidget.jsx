@@ -79,6 +79,13 @@ export default function ChatWidget() {
     if (typeof prompt === 'string' && prompt) setTimeout(() => sendRef.current?.(prompt), 50);
   }, []);
   const hide = useCallback(() => { setOpen(false); fabRef.current?.focus(); }, []);
+  const goToBooking = useCallback((e) => {
+    e?.preventDefault();
+    setOpen(false);
+    const el = document.getElementById('booking');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    else window.location.hash = '#booking';
+  }, []);
 
   useEffect(() => {
     const onOpen = (e) => show(e.detail?.prompt);
@@ -236,6 +243,7 @@ export default function ChatWidget() {
       <button
         ref={fabRef}
         className="cw-fab"
+        style={{ borderRadius: '50%' }}
         data-magnetic="0.25"
         data-cursor={open ? undefined : 'Ask AI'}
         aria-label={open ? 'Close chat' : 'Chat with Margam AI'}
@@ -314,7 +322,7 @@ export default function ChatWidget() {
                       {m.error && (
                         <div className="cw-err-actions">
                           <button onClick={retry}>Try again</button>
-                          <a href="#booking" onClick={hide}>Book a call instead</a>
+                          <a href="#booking" onClick={goToBooking}>Book a call instead</a>
                         </div>
                       )}
                     </div>
@@ -332,7 +340,7 @@ export default function ChatWidget() {
               {showFollowUps && (
                 <div className="cw-follow">
                   {followUps.map((s) => <button key={s} onClick={() => send(s)}>{s}</button>)}
-                  <a className="cw-follow-cta" href="#booking" onClick={hide}>Book a free strategy call ↗</a>
+                  <a className="cw-follow-cta" href="#booking" onClick={goToBooking}>Book a free strategy call ↗</a>
                 </div>
               )}
             </div>
@@ -356,7 +364,7 @@ export default function ChatWidget() {
               )}
               {input.length > MAX_CHARS - 300 && <span className="cw-count">{input.length}/{MAX_CHARS}</span>}
             </form>
-            <p className="cw-foot">AI assistant · answers come from margam360.com and may be imperfect. For anything important, <a href="#booking" onClick={hide}>talk to our team</a>.</p>
+            <p className="cw-foot">AI assistant · answers come from margam360.com and may be imperfect. For anything important, <a href="#booking" onClick={goToBooking}>talk to our team</a>.</p>
           </>
         )}
       </section>

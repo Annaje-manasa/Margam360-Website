@@ -2,11 +2,11 @@ import { useEffect, useRef } from 'react';
 import LAND from '../data/landDots.json';
 
 /*
-  Dotted world globe — recreated from the reference hero:
+  Dotted world globe matching the reference site exactly:
   dark sphere, white dotted continents lit from the upper-right,
-  glowing red limb, outer red halo, dashed orbit arcs, map pins with
-  dark pill labels, and dashed red flight arcs between offices.
-  Pure canvas, no 3D libs. Slow auto-rotation, pauses off-screen.
+  glowing red limb, outer red atmosphere halo, orbiting constellation dust,
+  satellite orbital ring with traveling satellites, map pins with
+  dark pill labels, and expanding arrival ripples with dashed flight arcs.
 */
 
 const RED = [229, 38, 31];
@@ -57,6 +57,47 @@ const ROUTE_PTS = ROUTES.map(([a, b]) => arcPoints(PLACE_V[a], PLACE_V[b]));
 
 const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
+const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 900px)').matches;
+const DUST_COUNT = isMobile ? 70 : 150;
+const DUST = (() => {
+  const d = new Float32Array(DUST_COUNT * 4);
+  for (let i = 0; i < DUST_COUNT; i++) {
+    let x = 0, y = 0, z = 0, len = 0;
+    while (len < 0.001) {
+      x = Math.random() * 2 - 1;
+      y = (Math.random() * 2 - 1) * 0.7;
+      z = Math.random() * 2 - 1;
+      len = Math.hypot(x, y, z);
+    }
+    const r = 1.05 + Math.pow(Math.random(), 1.6) * 0.29;
+    d[i * 4] = (x / len) * r;
+    d[i * 4 + 1] = (y / len) * r;
+    d[i * 4 + 2] = (z / len) * r;
+    d[i * 4 + 3] = Math.random() * 6.28;
+  }
+  return d;
+})();
+
+const ORBIT_STEPS = isMobile ? 90 : 150;
+const ORBIT_RADIUS = 1.24;
+const ORBIT_TILT_X = 1.2;
+const ORBIT_TILT_Y = -0.42;
+
+const makeSatelliteSprite = () => {
+  if (typeof document === 'undefined') return null;
+  const c = document.createElement('canvas');
+  c.width = c.height = 64;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,236,228,1)');
+  g.addColorStop(0.25, 'rgba(255,74,61,0.75)');
+  g.addColorStop(1, 'rgba(229,38,31,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 64, 64);
+  return c;
+};
+const SATELLITE_SPRITE = makeSatelliteSprite();
+
 const LIGHT = (() => {
   const l = [0.55, 0.62, 0.56];
   const m = Math.hypot(...l);
@@ -76,8 +117,12 @@ export default function Globe({ className = '' }) {
     // View: starts on the reference framing (Pacific-centred, Americas upper-right,
     // Australia lower-left) and slowly turns so Hyderabad (India) rolls into view.
     const view = { lon: -150, lat: 14, roll: -14, tiltX: 0, tiltY: 0 };
+    const targetTilt = { x: 0, y: 0 };
+    let arrivals = [];
+    const lastProgress = ROUTES.map(() => 0);
+    let orbitPhase = 0, satPhase = 0;
     let W = 0, H = 0, dpr = 1, R = 0, cx = 0, cy = 0;
-    let raf = 0, last = performance.now(), visible = true, t0 = last;
+    let raf = 0, last = performance.now(), visible = true;
     let pulse = 0; // jet-arrival flash 0..1
 
     const resize = () => {
@@ -96,13 +141,17 @@ export default function Globe({ className = '' }) {
     const backLayer = document.createElement('canvas');
     const frontLayer = document.createElement('canvas');
     const pulseLayer = document.createElement('canvas');
+    const glowLayer = document.createElement('canvas');
+
     const layerCtx = (c) => {
       c.width = canvas.width; c.height = canvas.height;
       const g = c.getContext('2d');
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       return g;
     };
+
     function buildLayers() {
+      // 1. Base halo and globe sphere body
       let g = layerCtx(backLayer);
       const halo = g.createRadialGradient(cx, cy, R * 0.92, cx, cy, R * 1.42);
       halo.addColorStop(0, rgba(RED, 0.28));
@@ -119,6 +168,7 @@ export default function Globe({ className = '' }) {
       g.fillStyle = body;
       g.fill();
 
+      // 2. Arrival pulse layer
       g = layerCtx(pulseLayer);
       const ph = g.createRadialGradient(cx, cy, R * 0.75, cx, cy, R * 1.5);
       ph.addColorStop(0, rgba(RED, 0));
@@ -127,6 +177,7 @@ export default function Globe({ className = '' }) {
       g.fillStyle = ph;
       g.fillRect(0, 0, W, H);
 
+      // 3. Inner rim glow + limb stroke
       g = layerCtx(frontLayer);
       const rim = g.createRadialGradient(cx, cy, R * 0.72, cx, cy, R);
       rim.addColorStop(0, rgba(RED, 0));
@@ -144,6 +195,28 @@ export default function Globe({ className = '' }) {
       g.lineWidth = Math.max(1.5, R * 0.009);
       g.stroke();
       g.stroke();
+
+      // 4. Outer atmosphere glow ring + crescent highlight
+      g = layerCtx(glowLayer);
+      const atmo = g.createRadialGradient(cx, cy, R * 0.99, cx, cy, R * 1.2);
+      atmo.addColorStop(0, rgba([255, 90, 70], 0.42));
+      atmo.addColorStop(0.18, rgba(RED, 0.16));
+      atmo.addColorStop(1, rgba(RED, 0));
+      g.fillStyle = atmo;
+      g.beginPath();
+      g.arc(cx, cy, R * 1.2, 0, Math.PI * 2);
+      g.arc(cx, cy, R * 0.99, 0, Math.PI * 2, true);
+      g.fill();
+      g.save();
+      g.shadowColor = 'rgba(255,200,185,0.9)';
+      g.shadowBlur = R * 0.05;
+      g.strokeStyle = 'rgba(255,226,216,0.38)';
+      g.lineCap = 'round';
+      g.lineWidth = Math.max(1, R * 0.008);
+      g.beginPath();
+      g.arc(cx, cy, R * 0.965, -Math.PI * 0.43, -Math.PI * 0.08);
+      g.stroke();
+      g.restore();
     }
 
     // rotation matrix for the current view
@@ -155,10 +228,6 @@ export default function Globe({ className = '' }) {
       const cl = Math.cos(lo), sl = Math.sin(lo);
       const cp = Math.cos(la), sp = Math.sin(la);
       const cr = Math.cos(ro), sr = Math.sin(ro);
-      // Ry(lo) then Rx(la) then Rz(ro)
-      // after Ry: x1 = x cl + z sl ; y1 = y ; z1 = -x sl + z cl
-      // after Rx: y2 = y1 cp - z1 sp ; z2 = y1 sp + z1 cp
-      // after Rz: x3 = x1 cr - y2 sr ; y3 = x1 sr + y2 cr
       const a = [cl, 0, sl];
       const b = [sl * sp, cp, -cl * sp];
       const c = [-sl * cp, sp, cl * cp];
@@ -174,7 +243,6 @@ export default function Globe({ className = '' }) {
     };
     const tmp = [0, 0, 0];
 
-    
     const drawPin = (x, y, s, hq, time) => {
       if (hq) {
         const ph = (time / 1600) % 1;
@@ -184,7 +252,6 @@ export default function Globe({ className = '' }) {
         ctx.lineWidth = 1.2;
         ctx.stroke();
       }
-      // teardrop pin
       const h = s * 2.3;
       ctx.save();
       ctx.shadowColor = rgba(RED, 0.9);
@@ -231,20 +298,47 @@ export default function Globe({ className = '' }) {
     const frame = (now) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
-      if (!reduce) view.lon -= dt * 5; // turns westward: Australia → India rolls in within ~10s (72s / rev)
+      if (!reduce) view.lon -= dt * 5;
+      const smooth = 1 - Math.pow(0.03, dt);
+      view.tiltX += (targetTilt.x - view.tiltX) * smooth;
+      view.tiltY += (targetTilt.y - view.tiltY) * smooth;
+      if (!reduce) {
+        orbitPhase += dt * 0.05;
+        satPhase += dt * 0.085;
+      }
       pulse = Math.max(0, pulse - dt * 0.9);
       buildMatrix();
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
 
-      // static layers (halo + sphere body) are pre-rendered on resize
+      // static layers (halo + sphere body)
       ctx.drawImage(backLayer, 0, 0, W, H);
       if (pulse > 0.01) {
         ctx.globalAlpha = pulse;
         ctx.drawImage(pulseLayer, 0, 0, W, H);
         ctx.globalAlpha = 1;
       }
+
+      // Constellation orbital dust
+      const cosO = Math.cos(orbitPhase), sinO = Math.sin(orbitPhase);
+      const drawDust = (isFront) => {
+        ctx.fillStyle = isFront ? '#ffe6de' : '#ff4a3d';
+        for (let n = 0; n < DUST.length; n += 4) {
+          const a = DUST[n], o = DUST[n + 2];
+          rot(a * cosO + o * sinO, DUST[n + 1], -a * sinO + o * cosO, tmp);
+          if ((tmp[2] > 0) !== isFront) continue;
+          const shimmer = 0.6 + 0.4 * Math.sin(now / 700 + DUST[n + 3]);
+          const alpha = (isFront ? 0.22 + tmp[2] * 0.5 : 0.18) * shimmer;
+          ctx.globalAlpha = alpha;
+          const sz = Math.max(0.8, R * (isFront ? 0.0062 : 0.0045));
+          ctx.fillRect(cx + tmp[0] * R - sz / 2, cy - tmp[1] * R - sz / 2, sz, sz);
+        }
+        ctx.globalAlpha = 1;
+      };
+
+      // Draw dust behind globe
+      drawDust(false);
 
       // dotted continents
       const ds = Math.max(1, R * 0.0072);
@@ -262,16 +356,18 @@ export default function Globe({ className = '' }) {
       }
       ctx.globalAlpha = 1;
 
-      // rim glow + glowing limb (pre-rendered)
+      // rim glow + glowing limb
       ctx.drawImage(frontLayer, 0, 0, W, H);
-
-
+      // outer glowing atmosphere ring + crescent
+      ctx.globalAlpha = 0.7 + 0.3 * Math.sin(now / 2400);
+      ctx.drawImage(glowLayer, 0, 0, W, H);
+      ctx.globalAlpha = 1;
 
       // flight arcs between offices
       const off = reduce ? 0 : -(now / 45);
       const dashLen = R * 0.022, gapLen = R * 0.018;
       const period = dashLen + gapLen;
-      const maxOutside = 3.05 * period; // allow max 3 dots (dashes) outside the globe edge
+      const maxOutside = 3.05 * period;
 
       ROUTE_PTS.forEach((pts, ri) => {
         ctx.save();
@@ -280,7 +376,6 @@ export default function Globe({ className = '' }) {
         ctx.lineWidth = Math.max(1, R * 0.0065);
         ctx.strokeStyle = rgba([255, 60, 45], 0.9);
 
-        // Pre-project points and calculate distance from globe edge
         const projected = [];
         for (let i = 0; i < pts.length; i++) {
           rot(pts[i][0], pts[i][1], pts[i][2], tmp);
@@ -290,7 +385,6 @@ export default function Globe({ className = '' }) {
           projected.push({ px, py, inFront, isOutside: rDist > 1.01, distEdge: 0 });
         }
 
-        // Forward pass: measure distance outside globe edge after exiting
         let acc = 9999;
         for (let i = 0; i < projected.length; i++) {
           const p = projected[i];
@@ -300,7 +394,6 @@ export default function Globe({ className = '' }) {
             p.distEdge = acc;
           }
         }
-        // Backward pass: measure distance outside globe edge before entering
         acc = 9999;
         for (let i = projected.length - 1; i >= 0; i--) {
           const p = projected[i];
@@ -331,6 +424,10 @@ export default function Globe({ className = '' }) {
         // travelling packet
         if (!reduce) {
           const k = ((now / 2600 + ri * 0.33) % 1);
+          if (k < lastProgress[ri]) {
+            arrivals.push({ v: PLACE_V[ROUTES[ri][1]], age: 0 });
+          }
+          lastProgress[ri] = k;
           const p = proj[Math.floor(k * (proj.length - 1))];
           if (p && p[2]) {
             const g = ctx.createRadialGradient(p[0], p[1], 0, p[0], p[1], R * 0.035);
@@ -344,6 +441,91 @@ export default function Globe({ className = '' }) {
           }
         }
       });
+
+      // Arrival ripples
+      arrivals = arrivals.filter((a) => (a.age += dt) < 1.5);
+      arrivals.forEach((a) => {
+        rot(a.v[0], a.v[1], a.v[2], tmp);
+        if (tmp[2] < 0.12) return;
+        const t = a.age / 1.5;
+        const rad = R * (0.02 + t * 0.13);
+        ctx.beginPath();
+        ctx.ellipse(cx + tmp[0] * R, cy - tmp[1] * R, Math.max(0.5, rad * tmp[2]), rad, Math.atan2(-tmp[1], tmp[0]), 0, Math.PI * 2);
+        ctx.strokeStyle = rgba([255, 90, 72], 0.85 * (1 - t) * Math.min(1, (tmp[2] - 0.12) * 4));
+        ctx.lineWidth = Math.max(1, R * 0.006) * (1 - t * 0.6);
+        ctx.stroke();
+      });
+
+      // Orbit ring and orbiting satellite
+      {
+        const cosX = Math.cos(ORBIT_TILT_X), sinX = Math.sin(ORBIT_TILT_X);
+        const cosY = Math.cos(ORBIT_TILT_Y), sinY = Math.sin(ORBIT_TILT_Y);
+        const tx = view.tiltX * D2R * 0.6, ty = view.tiltY * D2R * 0.6;
+        const ctxCos = Math.cos(tx), ctxSin = Math.sin(tx);
+        const ctyCos = Math.cos(ty), ctySin = Math.sin(ty);
+
+        const projectOrbitPoint = (angle, out) => {
+          let ox = Math.cos(angle) * ORBIT_RADIUS;
+          let oy = 0;
+          let oz = Math.sin(angle) * ORBIT_RADIUS;
+
+          // Rotation around X tilt
+          const py = oy * cosX - oz * sinX;
+          oz = oy * sinX + oz * cosX;
+          oy = py;
+
+          // Rotation around Y tilt
+          const px = ox * cosY - oy * sinY;
+          oy = ox * sinY + oy * cosY;
+          ox = px;
+
+          // View parallax tilts
+          const hx = ox * ctxCos + oz * ctxSin;
+          oz = -ox * ctxSin + oz * ctxCos;
+          ox = hx;
+
+          const hy = oy * ctyCos - oz * ctySin;
+          oz = oy * ctySin + oz * ctyCos;
+          oy = hy;
+
+          out[0] = ox; out[1] = oy; out[2] = oz;
+          return out;
+        };
+
+        const satellites = [satPhase % 1, (satPhase + 0.5) % 1];
+
+        // Orbit ring dotted track
+        for (let i = 0; i < ORBIT_STEPS; i++) {
+          const t = i / ORBIT_STEPS;
+          projectOrbitPoint(t * Math.PI * 2, tmp);
+
+          let lead = 0;
+          for (const s of satellites) {
+            const diff = (s - t + 1) % 1;
+            if (diff < 0.12) lead = Math.max(lead, 1 - diff / 0.12);
+          }
+          const depthAlpha = tmp[2] > 0 ? 1 : 0.45;
+          ctx.globalAlpha = (0.3 + lead * 0.65) * depthAlpha;
+          ctx.fillStyle = lead > 0.05 ? '#ff6a58' : '#ff4a3d';
+          const sz = Math.max(1.1, R * 0.0072) * (1 + lead * 1.4);
+          ctx.fillRect(cx + tmp[0] * R - sz / 2, cy - tmp[1] * R - sz / 2, sz, sz);
+        }
+        ctx.globalAlpha = 1;
+
+        // Orbiting glowing satellites
+        if (SATELLITE_SPRITE) {
+          satellites.forEach((s) => {
+            projectOrbitPoint(s * Math.PI * 2, tmp);
+            const sz = R * 0.11 * (tmp[2] > 0 ? 1 : 0.7);
+            ctx.globalAlpha = tmp[2] > 0 ? 1 : 0.5;
+            ctx.drawImage(SATELLITE_SPRITE, cx + tmp[0] * R - sz / 2, cy - tmp[1] * R - sz / 2, sz, sz);
+          });
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      // Draw dust in front of globe
+      drawDust(true);
 
       // pins + labels (front hemisphere only, fade near the limb)
       PLACES.forEach((pl, i) => {
@@ -375,8 +557,8 @@ export default function Globe({ className = '' }) {
     const onMove = (e) => {
       const nx = e.clientX / window.innerWidth - 0.5;
       const ny = e.clientY / window.innerHeight - 0.5;
-      view.tiltX = nx * 10;
-      view.tiltY = ny * -6;
+      targetTilt.x = nx * 10;
+      targetTilt.y = ny * -6;
     };
     if (!reduce) window.addEventListener('pointermove', onMove, { passive: true });
 

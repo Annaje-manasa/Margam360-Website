@@ -17,6 +17,18 @@ import iconDiscover from '../assets/icon-discover.png';
 import iconStrategize from '../assets/icon-strategize.png';
 import iconLaunch from '../assets/icon-launch.png';
 import iconScale from '../assets/icon-scale.png';
+import whyObjectives from '../assets/why-objectives.png';
+import whyExcellence from '../assets/why-excellence.png';
+import whySuccess from '../assets/why-success.png';
+import whyTeam from '../assets/why-team.png';
+import whyZeroJunk from '../assets/why-zero-junk.png';
+
+const WHY_MEDIA = {
+  'Objectives first': whyObjectives,
+  'Excellence always': whyExcellence,
+  'Highest success rate': whySuccess,
+  'Small team, big results': whyTeam,
+};
 
 const PROCESS_ICONS = [
   iconDiscover,
@@ -519,16 +531,37 @@ export function WhyUs() {
           <a href="#booking" className="btn-link" data-reveal data-magnetic="0.25">Talk to our team <span aria-hidden="true">→</span></a>
         </div>
         <div className="why-cards">
-          {WHY.map((w, i) => (
-            <div className="card why-card" key={w.title} data-reveal="card" data-tilt="4" data-spot style={{ '--d': `${i * 80}ms` }}>
-              <span className="why-check" aria-hidden="true">
-                <WhyIcon title={w.title} />
-              </span>
-              <h3>{w.title}</h3>
-              <p>{w.body}</p>
-            </div>
-          ))}
-          <div className="card why-card why-statement" data-reveal="card" data-tilt="2" data-spot style={{ '--d': '320ms' }}>
+          {WHY.map((w, i) => {
+            const isFeatured = w.title === 'Excellence always';
+            return (
+              <div
+                className={`card why-card ${isFeatured ? 'is-featured' : ''}`}
+                key={w.title}
+                data-reveal="card"
+                data-tilt="4"
+                data-spot
+                style={{ '--d': `${i * 80}ms` }}
+              >
+                <div className="why-card-media">
+                  <img src={WHY_MEDIA[w.title]} alt={w.title} loading="lazy" />
+                </div>
+                <div className="why-card-body">
+                  <h3>{w.title}</h3>
+                  <p>{w.body}</p>
+                </div>
+              </div>
+            );
+          })}
+          <div
+            className="card why-card why-statement"
+            data-reveal="card"
+            data-tilt="2"
+            data-spot
+            style={{
+              backgroundImage: `url(${whyZeroJunk})`,
+              '--d': '320ms',
+            }}
+          >
             <h3>Zero junk business.</h3>
             <p>We turn down clients we can’t genuinely help. We chase quality outcomes — never vanity metrics or inflated reports. Your growth is our reputation.</p>
           </div>
