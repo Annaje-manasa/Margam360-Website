@@ -310,7 +310,7 @@ export function generateResponse(messages, index) {
   if (intent === 'location') {
     return (
       "Margam360 is located at:\n\n" +
-      "**Madhusha Enclave, Beside NGRI Metro Station, Street No. 5, Hyderabad, Telangana, India.**\n\n" +
+      "**Flat No. 101, Madhusha Apartments, Street Number 5, Manikyapuri Colony, Habsiguda, Hyderabad, Telangana 500007.**\n\n" +
       "- **Working Hours**: Monday to Friday, 9 AM to 6 PM IST\n" +
       "- **Email**: [hi@margam360.com](mailto:hi@margam360.com)\n" +
       "- **Phone / WhatsApp**: +91 88855 54621\n\n" +

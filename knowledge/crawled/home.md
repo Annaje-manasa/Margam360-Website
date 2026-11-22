@@ -55,7 +55,7 @@ What you get with the call:
 
 ## Contact
 
-- Location: Madhusha Enclave, Beside NGRI Metro Station, Street No. 5, Hyderabad, Telangana, India
+- Location: Flat No. 101, Madhusha Apartments, Street Number 5, Manikyapuri Colony, Habsiguda, Hyderabad, Telangana 500007
 - Email: hi@margam360.com
 - Phone: +91 88855 54621
 - Office hours: Monday – Friday, 9 AM – 6 PM IST

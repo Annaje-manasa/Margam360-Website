@@ -6,7 +6,7 @@ export const CONTACT = {
   phone: '+91 88855 54621',
   phoneHref: 'tel:+918885554621',
   whatsapp: 'https://wa.me/918885554621',
-  address: 'Madhusha Enclave, Beside NGRI Metro Station, Street No. 5, Hyderabad',
+  address: 'Flat No. 101, Madhusha Apartments, Street Number 5, Manikyapuri Colony, Habsiguda, Hyderabad, Telangana 500007',
   hours: 'Mon – Fri, 9 AM – 6 PM IST',
 };
 

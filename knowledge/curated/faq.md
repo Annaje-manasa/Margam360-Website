@@ -22,7 +22,7 @@ Yes. The 30-minute growth call is free, with no pitch and no pressure, and you k
 Pricing is not published on the website. Engagements are scoped to each brand's goals and budget, so the best way to get a number is the free strategy call, or by emailing hi@margam360.com.
 
 ## Where is Margam360 located? Do you work with clients outside Hyderabad?
-The office is at Madhusha Enclave, Beside NGRI Metro Station, Street No. 5, Hyderabad, Telangana, India. Margam360 works with brands across India and the US.
+The office is at Flat No. 101, Madhusha Apartments, Street Number 5, Manikyapuri Colony, Habsiguda, Hyderabad, Telangana 500007. Margam360 works with brands across India and the US.
 
 ## What are your working hours?
 Monday to Friday, 9 AM to 6 PM IST.
