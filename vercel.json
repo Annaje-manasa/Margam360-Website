@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/ai-reel-system",
+      "destination": "https://ai.margam360.com/"
+    },
+    {
+      "source": "/ai-reel-system/:path*",
+      "destination": "https://ai.margam360.com/:path*"
+    }
+  ]
+}
