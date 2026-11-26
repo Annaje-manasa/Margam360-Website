@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { viteSingleFile } from 'vite-plugin-singlefile';
@@ -20,6 +22,10 @@ export default defineConfig(({ mode }) => ({
       '/assets': {
         target: 'https://ai.margam360.com',
         changeOrigin: true,
+        bypass: (req) => {
+          const localFile = path.join(process.cwd(), 'public', req.url.split('?')[0]);
+          if (fs.existsSync(localFile)) return req.url;
+        },
       },
     },
   },
