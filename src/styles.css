@@ -31,7 +31,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow-x: hidden; }
 body {
   margin: 0;
   background: var(--bg);
@@ -1312,18 +1312,110 @@ ul, ol, dl, dd { margin: 0; padding: 0; list-style: none; }
   .why-statement { padding: 28px 24px; }
 }
 @media (max-width: 560px) {
+  html, body { overflow-x: hidden; }
   .eyebrow-pill { font-size: 10.5px; letter-spacing: 0.1em; }
   .nav-cta { display: none; }
   .nav-toggle { margin-left: auto; }
-  .bento, .why-cards, .process { grid-template-columns: 1fr; }
-  .svc-featured, .svc-cta { grid-column: auto; padding: 28px; }
-  .svc-featured .svc-outcome strong { font-size: 54px; }
-  .hero-stats { grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .hero-stats dd { font-size: 12px; }
+
+  /* Hero */
+  .hero { padding-top: 86px; padding-bottom: 36px; }
+  .hero-title {
+    font-size: clamp(34px, 8.8vw, 50px);
+    line-height: 1.0;
+    white-space: normal;
+    word-break: break-word;
+    margin: 18px 0;
+  }
+  .hero-sub { font-size: 15px; line-height: 1.52; }
+  .hero-ctas {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 26px;
+  }
+  .hero-ctas .btn { width: 100%; text-align: center; justify-content: center; }
+  .hero-ctas .btn-link { justify-content: center; }
+  .hero-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 32px;
+    padding-top: 20px;
+  }
+  .hero-stats dt { font-size: clamp(22px, 5.8vw, 30px); }
+  .hero-stats dd { font-size: 11px; line-height: 1.35; margin-top: 4px; }
+  .hero-visual { max-width: 320px; margin: 0 auto; }
+
+  /* Headings & general flow */
+  .section-head h2 { font-size: clamp(28px, 7.5vw, 42px); line-height: 1.08; }
+  .section-head h2 em, .final h2 em { white-space: normal; }
+  .section-head .lead { font-size: 15px; margin-top: 14px; }
+
+  /* Services Bento */
+  .bento, .why-cards, .process { grid-template-columns: 1fr; gap: 14px; }
+  .svc { padding: 22px 20px; min-height: auto; }
+  .svc-featured, .svc-cta { grid-column: auto; padding: 24px 20px; }
+  .svc-featured h3 { padding-top: 14px; font-size: 24px; }
+  .svc-featured-globe { width: 220px; height: 220px; top: 12px; opacity: 0.65; }
+  .svc-featured .svc-outcome strong { font-size: clamp(38px, 10vw, 54px); }
+  .svc-orbit { display: none; }
+
+  /* AI Engine / Console */
+  .console-body { padding: 16px; gap: 14px; }
   .field-row, .contact-list, .console-kpis { grid-template-columns: 1fr; }
-  .bar-row { grid-template-columns: 90px 1fr 28px; }
+  .console-kpis div { padding: 12px 14px; }
+  .console-kpis strong { font-size: 22px; }
+  .bar-row { grid-template-columns: 80px 1fr 24px; gap: 8px; font-size: 12px; }
+  .console-insight { padding: 14px 16px; min-height: auto; }
+  .console-insight p { font-size: 12.5px; }
+
+  /* Process */
+  .proc-section { padding: 40px 0; }
+  .proc-heading { font-size: clamp(28px, 7.5vw, 40px); }
+  .proc-lead { font-size: 14px; margin-bottom: 20px; }
+  .proc-layout { gap: 28px; }
+  .proc-cards-list { gap: 14px; }
+  .proc-graphic-box { max-width: 260px; margin: 0 auto; }
+  .proc-v-row { gap: 10px; }
+  .proc-v-node-wrap { width: 34px; }
+  .proc-v-node { width: 32px; height: 32px; font-size: 12px; }
+  .proc-v-connector { display: none; }
+  .proc-v-card { padding: 14px 16px; gap: 12px; border-radius: 14px; }
+  .proc-v-icon-wrap { width: 44px; height: 44px; border-radius: 12px; }
+  .proc-v-text h3 { font-size: 16px; }
+  .proc-v-text p { font-size: 12px; line-height: 1.45; }
+
+  /* Why Us */
+  .why-statement { padding: 22px 18px; }
+  .why-statement p { font-size: 15px; }
+
+  /* Quotes / Testimonials */
+  .quote { padding: 22px 18px; gap: 18px; }
+  .quote blockquote { font-size: 17px; line-height: 1.4; }
+
+  /* Booking Form */
+  .form { padding: 20px 16px; border-radius: 16px; position: static; }
+  .form h3 { font-size: 24px; }
+  .chips { gap: 6px; }
+  .chip span { padding: 8px 12px; font-size: 12.5px; }
+  .bonuses li { padding: 14px 16px; gap: 12px; }
+
+  /* Final CTA & Footer */
+  .final { padding: 48px 0; }
+  .final h2 { font-size: clamp(30px, 8.5vw, 48px); }
+  .final .lead { font-size: 15px; margin: 16px auto 28px; }
+  .footer { padding-top: 40px; }
   .footer-grid { grid-template-columns: 1fr; }
-  .btn { padding: 17px 26px; }
+  .footer-base { flex-direction: column; align-items: center; text-align: center; gap: 14px; margin-top: 36px; padding-top: 18px; }
+  .footer-mega { font-size: clamp(44px, 13vw, 110px); }
+
+  .btn { padding: 15px 24px; }
+}
+
+@media (max-width: 380px) {
+  .hero-stats { gap: 6px; }
+  .hero-stats dd { font-size: 10px; }
+  .proc-v-node-wrap { display: none; }
+  .wa-fab { width: 46px; height: 46px; left: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
