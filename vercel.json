@@ -7,6 +7,14 @@
     {
       "source": "/ai-reel-system/:path*",
       "destination": "https://ai.margam360.com/:path*"
+    },
+    {
+      "source": "/assets/:path*",
+      "destination": "https://ai.margam360.com/assets/:path*"
+    },
+    {
+      "source": "/step/:path*",
+      "destination": "https://ai.margam360.com/step/:path*"
     }
   ]
 }
